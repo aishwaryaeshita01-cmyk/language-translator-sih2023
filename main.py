@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from googletrans import Translator, LANGUAGES
 from typing import Optional
+import os
 
 app = FastAPI(
     title="Multilingual NLP Translation API",
@@ -33,8 +35,11 @@ class TranslationResponse(BaseModel):
     source_lang: str
     target_lang: str
 
-@app.get("/")
+# Serve the index.html UI at root URL
+@app.get("/", response_class=FileResponse)
 def read_root():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
     return {
         "status": "online",
         "message": "Multilingual Translation API Ready",
